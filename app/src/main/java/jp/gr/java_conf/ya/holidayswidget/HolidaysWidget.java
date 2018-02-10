@@ -13,6 +13,9 @@ import android.util.Log;
 import android.widget.RemoteViews;
 
 import java.net.URL;
+import java.util.Calendar;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 
@@ -69,10 +72,51 @@ public class HolidaysWidget extends AppWidgetProvider {
                         }
 
                         public void onPostExecute(String[] result) {
-
-                            Log.v("Hol", result[0]);
-
                             List<ListItem> holidaysList = CsvUtil.parse(result[0]);
+
+                            Calendar calendar = Calendar.getInstance();
+                            calendar.setTime(today);
+                            for (int i = 0; i < 7 * 10; i++) {
+                                final ListItem item = new ListItem();
+                                switch (calendar.get(Calendar.DAY_OF_WEEK)) {
+                                    case Calendar.SUNDAY:
+                                        item.setDate(calendar.getTime());
+                                        item.setName("");
+                                        holidaysList.add(item);
+                                        break;
+                                    case Calendar.SATURDAY:
+                                        item.setDate(calendar.getTime());
+                                        item.setName("");
+                                        holidaysList.add(item);
+                                        break;
+                                    default:
+                                        break;
+                                }
+
+                                calendar.add(Calendar.DAY_OF_MONTH, 1);
+                            }
+
+                            Collections.sort(holidaysList, new Comparator<ListItem>() {
+                                public int compare(ListItem a, ListItem b) {
+                                    long no1 = a.getDate().getTime();
+                                    long no2 = b.getDate().getTime();
+
+                                    if (no1 > no2)
+                                        return 1;
+                                    else if (no1 == no2)
+                                        return 0;
+                                    else
+                                        return -1;
+                                }
+
+                            });
+
+                            for (int i = holidaysList.size() - 1; i > 0; i--) {
+                                if (ListItem.sdFormat.format(holidaysList.get(i).getDate().getTime()).equals(ListItem.sdFormat.format(holidaysList.get(i - 1).getDate().getTime()))) {
+                                    holidaysList.remove(i);
+                                }
+                            }
+
 
                             final StringBuilder sb = new StringBuilder();
                             sb.append(ListItem.sdFormat.format(today)).append("\n\n");
