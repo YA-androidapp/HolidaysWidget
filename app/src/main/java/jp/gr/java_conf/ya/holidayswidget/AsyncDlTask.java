@@ -34,7 +34,6 @@ public final class AsyncDlTask extends AsyncTask<URL, Integer, String[]> {
         final String[] results = new String[count];
         Arrays.fill(results, "");
 
-        // ファイルのダウンロード合計サイズ
         for (int i = 0; i < count; i++) {
             results[i] = downloadText(urls[i]);
             publishProgress((int) ((i / (float) count) * 100));
@@ -70,6 +69,8 @@ public final class AsyncDlTask extends AsyncTask<URL, Integer, String[]> {
 
     protected String downloadText(final URL url) {
         try {
+            Log.v("Hol", url.toString());
+
             final HttpURLConnection httpURLConnection = (HttpURLConnection) url.openConnection();
             httpURLConnection.setConnectTimeout(10000);
             httpURLConnection.setDoInput(true);
